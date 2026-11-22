@@ -7,15 +7,23 @@
 // directory; it runs twice and both runs must write the same bytes, so
 // this is a plain copy with no randomness and no network.
 //
+// Before copying, it checks the source is a non-empty image under the
+// 1 MiB gate limit, so a missing or oversized file fails loudly here
+// instead of producing a bad entry.
+//
 // Local check:
 //   mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
 
-import { copyFileSync, mkdirSync } from "node:fs";
+import { copyFileSync, mkdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
+const source = new URL("./entry.png", import.meta.url);
+const size = statSync(source).size;
+if (size === 0 || size > 1048576) {
+  throw new Error(
+    `entry.png is ${size} bytes; expected a non-empty image under 1 MiB`,
+  );
+}
 mkdirSync(outDir, { recursive: true });
-copyFileSync(
-  new URL("./entry.png", import.meta.url),
-  join(outDir, "entry.png"),
-);
+copyFileSync(source, join(outDir, "entry.png"));

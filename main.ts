@@ -7,6 +7,10 @@
 // directory; it runs twice and both runs must write the same bytes, so
 // this is a plain copy with no randomness and no network.
 //
+// v3: the image keeps the same 39 stories and layout, but drops the
+// date-check footer and every mention of other days (wrong-day events
+// and Sunday items) so the page names Saturday 21 November 2026 only.
+//
 // Before copying, it checks the source is a non-empty image under the
 // 1 MiB gate limit, so a missing or oversized file fails loudly here
 // instead of producing a bad entry.
